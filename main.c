@@ -249,6 +249,14 @@ int main() {
                        bot, botRow + 1, botCol + 1);
             }
             printf("Ничья!\n");
+
+
+
+
+
+
+
+            
             break;
         }
 
