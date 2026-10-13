@@ -146,3 +146,116 @@ void botMove(char p) {
     }
 }
 
+void humanMove(char p) {
+    while (1) {
+        printf("Ход игрока %c.\n", p);
+        int r = getNumber("  Строка: ", 1, rows) - 1;
+        int c = getNumber("  Столбец: ", 1, cols) - 1;
+
+        if (field[r][c] != '.') {
+            printf("Клетка занята, выберите другую.\n");
+        }
+        else {
+            field[r][c] = p;
+            break;
+        }
+    }
+}
+
+int main() {
+    setupConsole();
+    srand((unsigned)time(NULL));
+
+    printf("=== КРЕСТИКИ-НОЛИКИ ===\n\n");
+
+    rows = getNumber("Количество строк (3-20): ", 3, 20);
+    cols = getNumber("Количество столбцов (3-20): ", 3, 20);
+
+    
+    winH = cols;
+    winV = rows;
+    winD = (rows < cols) ? rows : cols;
+
+    printf("\nРежим игры:\n  1 - против бота\n  2 - два игрока\n");
+    int mode = getNumber("Выбор: ", 1, 2);
+
+    char human = 'X';
+    char bot = 'O';
+    if (mode == 1) {
+        printf("\nЗа кого играть?\n  1 - крестики (X, ходят первыми)\n  2 - нолики (O)\n");
+        int choice = getNumber("Выбор: ", 1, 2);
+        if (choice == 2) {
+            human = 'O';
+            bot = 'X';
+        }
+    }
+
+    
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+            field[i][j] = '.';
+        }
+    }
+
+    char current = 'X';
+    int botMoved = 0;
+
+    while (1) {
+        if (mode == 1 && current == bot) {
+            botMove(bot);
+            botMoved = 1;
+        }
+        else {
+            clearScreen();
+            printf("Поле %dx%d | Победа: гор. %d, верт. %d, диаг. %d\n",
+                   rows, cols, winH, winV, winD);
+            drawField();
+            if (botMoved == 1) {
+                printf("Бот (%c) сходил: строка %d, столбец %d.\n",
+                       bot, botRow + 1, botCol + 1);
+            }
+            humanMove(current);
+            botMoved = 0;
+        }
+
+        
+        if (checkWin(current) == 1) {
+            clearScreen();
+            drawField();
+            if (botMoved == 1) {
+                printf("Бот (%c) сходил: строка %d, столбец %d.\n",
+                       bot, botRow + 1, botCol + 1);
+            }
+            if (mode == 1) {
+                if (current == human) {
+                    printf("Вы победили!\n");
+                }
+                else {
+                    printf("Бот победил!\n");
+                }
+            }
+            else {
+                printf("Победил игрок %c!\n", current);
+            }
+            break;
+        }
+
+        
+        if (isFull() == 1) {
+            clearScreen();
+            drawField();
+            if (botMoved == 1) {
+                printf("Бот (%c) сходил: строка %d, столбец %d.\n",
+                       bot, botRow + 1, botCol + 1);
+            }
+            printf("Ничья!\n");
+            break;
+        }
+
+        
+        current = (current == 'X') ? 'O' : 'X';
+    }
+
+    pauseConsole();
+    return 0;
+}
